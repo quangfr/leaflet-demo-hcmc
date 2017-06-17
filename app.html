@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8"/>
+    <title>Đặt hẹn khám  bác sĩ</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.0.3/leaflet.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.0.3/leaflet.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./css/style.css" />
+    <link rel="stylesheet" href="./css/MarkerCluster.css" />
+    <script src="./js/MarkerCluster.js"></script>
+        <script src="data.js"></script>
+    <script src="./js/date.js"></script>
+
+  </head>
+  <body>
+
+    <div id="map"></div>
+    <span>Mouse over a cluster to see the bounds of its children and click a cluster to zoom to those bounds</span>
+    <script type="text/javascript">
+
+      var tiles = L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+      maxZoom: 18,
+      attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors, Points &copy 2012 LINZ'
+      }),
+      latlng = L.latLng(10.77, 106.68);
+
+      var map = L.map('map', {center: latlng, zoom: 13, layers: [tiles]});
+
+      var markers = L.markerClusterGroup();
+      
+      //a[8], a[9], a[10] to be edited in data.js
+
+      for (var i = 0; i < addressPoints.length; i++) {
+			  var a = addressPoints[i];
+			  var title = a[2];
+			 
+			  var marker = L.marker(new L.LatLng(a[0], a[1]), { title: title });
+			  marker.bindPopup(a[2]+'</br>Địa chỉ '+a[3]+'</br>ĐT '+a[4]+'<br><br><b>'+a[5]+'</b><br><p style="text-align: left"><select id="bookdate"><option value='+a[7]+'>'+a[7]+'</option><option value='+a[8]+'>'+a[8]+'</option><option value='+a[9]+'>'+a[9]+'</option></select></br></br><button onClick="setEvent('+i+')">ĐẶT LỊCH HẸN</button></br></br><button onClick="chat('+i+')">LIÊN LẠC VƠÍ BÁC SĨ</button></p>');
+			  markers.addLayer(marker)
+			  }
+
+			  map.addLayer(markers);
+//Convert string to Date
+function cDate(date){
+	this.date=date;
+   this.day= date.substr(0,2);
+   this.month= date.substr(3,2);
+   this.hours= date.substr(6,2);
+   this.minutes= date.substr(9,2);
+
+}
+
+
+setEvent = function(i){
+			  var a = addressPoints[i];
+			  userid=a[6];
+			  var e = document.getElementById("bookdate");
+			  var f = e.options[e.selectedIndex].text;
+			  var sdate = new cDate(f);
+			  var date = new Date(2017,sdate.month,sdate.day,sdate.hours,sdate.minutes,0,0)
+			  date2=date.getTime();
+			  alert(date+' '+date2);
+		
+
+			  start = date2;
+			  end = date2+1000*60*30; //30 minutes meeting
+
+
+
+			  urlredirect = 'http://localhost:8080/#/?continue='+encodeURIComponent('/calendar?viewMode=agendaThreeDays&start=2017-05-01&end=2017-05-30&startDate='+start+'&endDate='+end+'&eventName=Hẹn lịch khám chữa bệnh&invite='+userid+'&location='+a[2]+', '+a[3]);
+			  console.log(urlredirect);
+			  window.location = urlredirect;
+			  }
+			  chat = function(i){
+			  var a = addressPoints[i];
+			  userid=a[6];
+			  urlredirect = 'http://localhost:8080/#/?continue=/chat/launch/'+userid;
+			  console.log(urlredirect);
+			  window.location = urlredirect;
+			  }
+			  </script>
+</body>
+</html>
